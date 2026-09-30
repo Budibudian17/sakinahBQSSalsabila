@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { ArrowLeft, BookOpen, Mail, MessageCircle, Phone, Search, Send, ShieldCheck, UserRound, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 
 export const Route = createFileRoute("/help")({
   head: () => ({ meta: [
@@ -110,7 +110,7 @@ function HelpPage() {
 
   const hasResults = filteredCategories.length > 0 || filteredFAQs.length > 0;
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     <div className="mb-6 sm:mb-8">
       <Link to="/" className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary sm:mb-5"><ArrowLeft size={12} /> Kembali ke dashboard</Link>
       <div><p className="eyebrow">Dukungan Pengguna</p><h1 className="page-title">Pusat Bantuan <span className="text-rose">✦</span></h1><p className="mt-2 text-sm text-muted-foreground">Kami siap membantu kamu. Cari jawaban atau hubungi tim dukungan kami.</p></div>
@@ -252,5 +252,5 @@ function HelpPage() {
         </Button>
       </form>
     </div>
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }

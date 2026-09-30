@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Camera, Check, Clock3, QrCode, ScanLine, ShieldCheck, Sparkles, X, Search, WifiOff, Calendar, AlertCircle } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 import { EmptyState } from "@/components/empty-state";
 import { CardSkeleton, TableSkeleton } from "@/components/ui/page-skeleton";
 import jsQR from "jsqr";
@@ -282,7 +282,7 @@ function AbsensiPage() {
     }
   };
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     <div className="mb-6 sm:mb-8">
       <Link to="/" className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary sm:mb-5"><ArrowLeft size={12} /> Kembali ke dashboard</Link>
       <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow">Kehadiran Kajian</p><h1 className="page-title">Absen QR <span className="text-rose">✦</span></h1><p className="mt-2 text-sm text-muted-foreground">Satu langkah mudah untuk mencatat kehadiranmu.</p></div></div>
@@ -430,5 +430,5 @@ function AbsensiPage() {
         </>
       )}
     </div></section>
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }

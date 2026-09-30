@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 
 export const Route = createFileRoute("/infaq")({
   head: () => ({ meta: [
@@ -22,9 +22,9 @@ function InfaqPage() {
     router.navigate({ to: '/keuangan' });
   }, [router]);
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     <div className="flex items-center justify-center py-12">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
     </div>
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }

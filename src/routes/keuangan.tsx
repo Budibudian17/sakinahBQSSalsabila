@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Wallet, Plus, Search, Filter, CreditCard, TrendingUp, Calendar, CheckCircle2, AlertCircle, X, Info } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/page-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -193,7 +193,7 @@ function KeuanganPage() {
     }
   };
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     <div className="mb-6 flex flex-col gap-4 sm:mb-8">
       <div className="min-w-0">
         <Link to="/" className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary sm:mb-5">
@@ -425,5 +425,5 @@ function KeuanganPage() {
         </div>
       </div>
     )}
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }

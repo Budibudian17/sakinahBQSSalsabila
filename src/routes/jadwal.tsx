@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ArrowLeft, BookOpenText, CalendarDays, Clock3, MapPin, UsersRound, ChevronRight, Check, ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 import { WeeklyCalendar } from "@/components/weekly-calendar";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -143,7 +143,7 @@ function JadwalPage() {
     }));
   };
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         <Link to="/" className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary sm:mb-5">
@@ -414,5 +414,5 @@ function JadwalPage() {
         </div>
       </div>
     )}
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }

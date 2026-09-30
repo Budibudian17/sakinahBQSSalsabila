@@ -23,7 +23,7 @@ const supportNavigation = [
   { label: "Pusat Bantuan", icon: CircleHelp, to: "/help" as const },
 ];
 
-export function BQS SalsabillaShell({ children }: { children: ReactNode }) {
+export function SalsabillaShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);

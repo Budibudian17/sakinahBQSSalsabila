@@ -2,7 +2,7 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ArrowRight, BookOpenText, CalendarDays, Clock3, CreditCard, GraduationCap, MapPin, QrCode, UsersRound, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 import { WeeklyCalendar } from "@/components/weekly-calendar";
 import { EmptyState } from "@/components/empty-state";
 import { supabase } from "@/integrations/supabase/client";
@@ -202,7 +202,7 @@ function DashboardPage() {
     },
   ];
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         <p className="eyebrow">Ruang Belajarmu</p>
@@ -265,5 +265,5 @@ function DashboardPage() {
       <div className="flex flex-col gap-4 rounded-md border border-border bg-sage-light px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-5"><div className="flex items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center text-primary sm:h-10 sm:w-10"><QrCode size={18} className="sm:size-20" /></span><div><p className="text-sm font-bold">Sudah siap untuk kajian berikutnya?</p><p className="mt-0.5 text-xs text-muted-foreground">Catat kehadiranmu dengan mudah saat tiba di lokasi.</p></div></div><Button asChild className="w-full sm:w-auto"><Link to="/absensi">Absen dengan QR <ArrowRight size={16} /></Link></Button></div>
       <div className="flex flex-col gap-4 rounded-md border border-border bg-sage-light px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-5"><div className="flex items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center text-primary sm:h-10 sm:w-10"><CreditCard size={18} className="sm:size-20" /></span><div><p className="text-sm font-bold">Catat keuangan pembelajaranmu</p><p className="mt-0.5 text-xs text-muted-foreground">Input pembayaran SPP, infaq, dan pengeluaran.</p></div></div><Button asChild className="w-full sm:w-auto"><Link to="/keuangan">Kelola Keuangan <ArrowRight size={16} /></Link></Button></div>
     </section>
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }

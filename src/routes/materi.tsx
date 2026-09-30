@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ArrowLeft, BookOpenText, CalendarDays, Search, Filter, ExternalLink, FileText, Download, X, AlertCircle, UsersRound, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 import { PageHeaderSkeleton, CardSkeleton } from "@/components/ui/page-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -89,7 +89,7 @@ function MateriPage() {
 
   const categories = ['Al-Qur\'an', 'Fiqih', 'Sejarah', 'Akhlak', 'Lainnya'];
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     {loading ? (
       <PageHeaderSkeleton />
     ) : (
@@ -315,5 +315,5 @@ function MateriPage() {
         </div>
       </div>
     )}
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }

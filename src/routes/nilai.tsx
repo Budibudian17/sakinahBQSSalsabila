@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ArrowLeft, BookOpenText, Award, TrendingUp, ChevronRight, Check, Circle, PlayCircle, Target, Calendar, Star, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BQS SalsabillaShell } from "@/components/sakinah-shell";
+import { SalsabillaShell } from "@/components/sakinah-shell";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/nilai")({
@@ -131,7 +131,7 @@ function NilaiPage() {
     }
   };
 
-  return <BQS SalsabillaShell>
+  return <SalsabillaShell>
     <div className="mb-6 flex flex-col gap-4 sm:mb-8">
       <div className="min-w-0">
         <Link to="/" className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary sm:mb-5">
@@ -469,5 +469,5 @@ function NilaiPage() {
     )}
       </>
     )}
-  </BQS SalsabillaShell>;
+  </SalsabillaShell>;
 }
