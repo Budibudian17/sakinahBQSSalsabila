@@ -1,0 +1,42 @@
+{
+  "name": "Sakinah - Sakinah Ruang Muslimah",
+  "short_name": "Sakinah",
+  "description": "Sistem manajemen kajian dan absensi untuk Sakinah Ruang Muslimah",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4a4a4a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logopengajianbaru.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logopengajianbaru.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Buka dashboard utama",
+      "url": "/",
+      "icons": [{ "src": "/logopengajianbaru.webp", "sizes": "96x96" }]
+    },
+    {
+      "name": "Absensi",
+      "short_name": "Absensi",
+      "description": "Scan QR untuk absensi",
+      "url": "/absensi",
+      "icons": [{ "src": "/logopengajianbaru.webp", "sizes": "96x96" }]
+    }
+  ]
+}

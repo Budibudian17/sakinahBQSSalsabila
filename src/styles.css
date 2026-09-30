@@ -1,0 +1,149 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-nav-active: var(--nav-active);
+  --color-sage-light: var(--sage-light);
+  --color-rose: var(--rose);
+  --color-rose-light: var(--rose-light);
+  --color-rose-foreground: var(--rose-foreground);
+  --color-amber-light: var(--amber-light);
+  --color-amber-foreground: var(--amber-foreground);
+  --color-lavender-light: var(--lavender-light);
+  --color-lavender-foreground: var(--lavender-foreground);
+  --color-banner: var(--banner);
+  --color-overlay: var(--overlay);
+  --color-scanner-foreground: var(--scanner-foreground);
+  --shadow-soft: 0 3px 16px -8px var(--shadow-color);
+  --shadow-panel: 0 14px 40px -15px var(--shadow-color);
+  --shadow-laser: 0 0 18px 4px var(--laser-glow);
+}
+
+:root {
+  --background: oklch(0.98 0.01 310);
+  --foreground: oklch(0.65 0.15 310);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.65 0.15 310);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.65 0.15 310);
+  --primary: oklch(0.6 0.2 310);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.02 310);
+  --secondary-foreground: oklch(0.6 0.15 310);
+  --muted: oklch(0.95 0.01 310);
+  --muted-foreground: oklch(0.6 0.05 310);
+  --accent: oklch(0.93 0.03 310);
+  --accent-foreground: oklch(0.6 0.15 310);
+  --destructive: oklch(0.59 0.18 28);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0.02 310);
+  --input: oklch(0.92 0.02 310);
+  --ring: oklch(0.6 0.15 310);
+  --sidebar: oklch(0.99 0.01 310);
+  --nav-active: oklch(0.93 0.08 310);
+  --sage-light: oklch(0.94 0.04 310);
+  --rose: oklch(0.65 0.2 310);
+  --rose-light: oklch(0.96 0.04 310);
+  --rose-foreground: oklch(0.55 0.15 310);
+  --amber-light: oklch(0.967 0.034 77);
+  --amber-foreground: oklch(0.53 0.083 65);
+  --lavender-light: oklch(0.95 0.04 310);
+  --lavender-foreground: oklch(0.6 0.1 310);
+  --banner: oklch(0.9 0.04 310);
+  --overlay: oklch(0.65 0.15 310 / 40%);
+  --scanner-foreground: oklch(0.86 0.15 310);
+  --scanner-base: oklch(0.21 0.047 160);
+  --scanner-grid: oklch(0.82 0.15 310 / 8%);
+  --laser-glow: oklch(0.79 0.2 310 / 65%);
+  --shadow-color: oklch(0.65 0.1 310 / 16%);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  html, body { overflow-x: hidden; }
+}
+
+@utility page-title { font-size: clamp(1.65rem, 2.5vw, 2.15rem); line-height: 1.25; font-weight: 800; color: var(--foreground); margin-top: .35rem; }
+@utility section-title { font-size: 1.15rem; line-height: 1.4; font-weight: 800; color: var(--foreground); }
+@utility eyebrow { font-size: .625rem; text-transform: uppercase; letter-spacing: .17em; font-weight: 800; color: var(--primary); }
+
+.brand-symbol { width: 34px; height: 34px; display: grid; place-items: center; background: var(--primary); color: var(--primary-foreground); border-radius: 9px 9px 9px 2px; font-size: 23px; line-height: 1; }
+.brand-symbol span { transform: translateY(-1px); }
+.banner-overlay { background: linear-gradient(90deg, var(--banner) 0%, var(--banner) 29%, color-mix(in oklch, var(--banner) 85%, transparent) 44%, transparent 74%); }
+.scanner-stage { background: var(--scanner-base); }
+.scanner-grid { background-image: linear-gradient(var(--scanner-grid) 1px, transparent 1px), linear-gradient(90deg, var(--scanner-grid) 1px, transparent 1px); background-size: 25px 25px; }
+.scan-corner { position: absolute; width: 27px; height: 27px; border-color: var(--scanner-foreground); border-width: 0; border-style: solid; border-radius: 3px; }
+.scan-corner.border-t { border-top-width: 3px; }.scan-corner.border-b { border-bottom-width: 3px; }.scan-corner.border-l { border-left-width: 3px; }.scan-corner.border-r { border-right-width: 3px; }
+.scan-laser { background: var(--scanner-foreground); animation: scanning 3s ease-in-out infinite alternate; }
+@keyframes scanning { from { top: 16%; } to { top: 84%; } }
+.demo-qr { position: relative; width: 168px; height: 168px; padding: 10px; background: var(--card); box-shadow: 0 2px 12px var(--shadow-color); border-radius: 6px; }
+.qr-pattern { display: block; width: 100%; height: 100%; background: repeating-conic-gradient(var(--foreground) 0% 25%, transparent 0% 50%) 0 0 / 18px 18px; opacity: .72; }
+.qr-corner { position: absolute; z-index: 1; width: 43px; height: 43px; border: 8px solid var(--foreground); background: var(--card); box-shadow: inset 0 0 0 6px var(--card), inset 0 0 0 14px var(--foreground); }
+.qr-top-left { top: 10px; left: 10px; }.qr-top-right { top: 10px; right: 10px; }.qr-bottom-left { bottom: 10px; left: 10px; }
+.qr-center { position: absolute; z-index: 2; top: 55%; left: 55%; width: 38px; height: 38px; display: grid; place-items: center; background: var(--card); color: var(--primary); border-radius: 50%; font-size: 22px; }
+@media (max-width: 639px) { .banner-overlay { background: linear-gradient(90deg, color-mix(in oklch, var(--banner) 97%, transparent) 0%, color-mix(in oklch, var(--banner) 92%, transparent) 52%, color-mix(in oklch, var(--banner) 10%, transparent) 100%); } }
+@media (prefers-reduced-motion: reduce) { .scan-laser { animation: none; } }
+
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* QR Scanner styles */
+.qr-scanner video { object-fit: cover; }
+.qr-scanner__overlay { position: absolute; inset: 0; pointer-events: none; }
+.qr-scanner__highlight-region { border: 2px solid var(--primary); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
+
+/* Security - Disable inspecting */
+html, body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Disable text selection for all elements */
+::selection {
+  background: transparent;
+}
+
+::-moz-selection {
+  background: transparent;
+}
+
+/* Allow input fields to be selectable */
+input, textarea, [contenteditable] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
