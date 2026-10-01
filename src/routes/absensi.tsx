@@ -146,24 +146,29 @@ function AbsensiPage() {
     try {
       setAttendanceError(null);
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         setAttendanceError('Anda harus login untuk absensi');
         return;
       }
 
-      // Validate QR code with database
+      console.log('QR Data scanned:', qrData);
+
+      // Validate QR code with database - more flexible matching
       const { data: qrCode, error: qrError } = await supabase
         .from('qr_codes' as any)
         .select('*')
-        .eq('qr_code_data' as any, JSON.stringify(qrData) as any)
+        .eq('qr_code_id' as any, qrData.qr_code_id as any)
         .eq('is_active' as any, true as any)
         .single();
 
       if (qrError || !qrCode) {
+        console.error('QR validation error:', qrError);
         setAttendanceError('QR code tidak valid atau sudah tidak aktif');
         return;
       }
+
+      console.log('QR Code found:', qrCode);
 
       // Check if QR code is expired
       if ((qrCode as any).expires_at && new Date((qrCode as any).expires_at) < new Date()) {
@@ -171,17 +176,20 @@ function AbsensiPage() {
         return;
       }
 
-      // Check if already scanned
+      // Check if already scanned TODAY for this QR code
+      const today = new Date().toISOString().split('T')[0];
       const { data: existingAttendance, error: checkError } = await supabase
         .from('qr_attendance' as any)
         .select('*')
         .eq('qr_code_id' as any, (qrCode as any).id as any)
-        .eq('user_id' as any, user.id as any);
+        .eq('user_id' as any, user.id as any)
+        .gte('scan_time' as any, today + 'T00:00:00')
+        .lte('scan_time' as any, today + 'T23:59:59');
 
       if (checkError) throw checkError;
 
       if (existingAttendance && existingAttendance.length > 0) {
-        setAttendanceError('Anda sudah absen untuk kajian ini');
+        setAttendanceError('Anda sudah absen untuk kajian ini hari ini');
         return;
       }
 
@@ -199,7 +207,7 @@ function AbsensiPage() {
 
       setSuccessMessage(`Absensi berhasil tercatat untuk ${(qrCode as any).lesson}`);
       setTimeout(() => setSuccessMessage(null), 3000);
-      
+
       // Refresh history
       await fetchAttendanceHistory();
     } catch (err) {
