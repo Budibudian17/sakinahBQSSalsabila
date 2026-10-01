@@ -108,15 +108,17 @@ function DashboardPage() {
       const { data: schedules } = await supabase
         .from('schedules' as any)
         .select('*')
-        .order('sort_order', { ascending: true });
+        .is('is_deleted' as any, false)
+        .eq('status' as any, 'Aktif' as any)
+        .order('created_at', { ascending: false });
 
       if (schedules && schedules.length > 0) {
         const scheduleData = schedules.map((s: any) => ({
-          subject: s.subject,
-          category: s.category,
-          teacher: s.teacher,
-          day: s.day_label,
-          room: s.room,
+          subject: s.judul || s.subject,
+          category: s.kategori || s.category,
+          teacher: s.ustadzah || s.teacher,
+          day: s.hari || s.day_label,
+          room: s.ruang || s.room,
           iconClass: 'bg-sage-light text-primary'
         }));
         setSchedule(scheduleData);
@@ -125,9 +127,9 @@ function DashboardPage() {
         const announcementSchedule = schedules.find((s: any) => s.is_announcement === true || s.announcement);
         if (announcementSchedule) {
           setAnnouncement({
-            title: (announcementSchedule as any).announcement_title || (announcementSchedule as any).subject,
-            description: (announcementSchedule as any).announcement || (announcementSchedule as any).subject,
-            date: (announcementSchedule as any).announcement_date || (announcementSchedule as any).day_label,
+            title: (announcementSchedule as any).announcement_title || (announcementSchedule as any).judul || (announcementSchedule as any).subject,
+            description: (announcementSchedule as any).announcement || (announcementSchedule as any).deskripsi || (announcementSchedule as any).subject,
+            date: (announcementSchedule as any).announcement_date || (announcementSchedule as any).hari || (announcementSchedule as any).day_label,
             time: (announcementSchedule as any).announcement_time || '08.00 WIB'
           });
         }
