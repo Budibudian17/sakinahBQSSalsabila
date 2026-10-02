@@ -154,20 +154,22 @@ function AbsensiPage() {
 
       console.log('QR Data scanned:', qrData);
 
-      // Validate QR code with database - more flexible matching
-      const { data: qrCode, error: qrError } = await supabase
+      // Validate QR code with database - match by lesson and date (more reliable than qr_code_id which rotates)
+      const { data: qrCodes, error: qrError } = await supabase
         .from('qr_codes' as any)
         .select('*')
-        .eq('qr_code_id' as any, qrData.qr_code_id as any)
-        .eq('is_active' as any, true as any)
-        .single();
+        .eq('lesson' as any, qrData.lesson as any)
+        .eq('date' as any, qrData.date as any)
+        .eq('is_active' as any, true as any);
 
-      if (qrError || !qrCode) {
+      if (qrError || !qrCodes || qrCodes.length === 0) {
         console.error('QR validation error:', qrError);
         setAttendanceError('QR code tidak valid atau sudah tidak aktif');
         return;
       }
 
+      // Get the most recent active QR code for this lesson/date
+      const qrCode = qrCodes[0];
       console.log('QR Code found:', qrCode);
 
       // Check if QR code is expired
@@ -176,19 +178,29 @@ function AbsensiPage() {
         return;
       }
 
-      // Check if already scanned TODAY for this QR code
+      // Check if already scanned TODAY for this lesson/date (prevents multiple attendance for same class)
       const today = new Date().toISOString().split('T')[0];
       const { data: existingAttendance, error: checkError } = await supabase
         .from('qr_attendance' as any)
-        .select('*')
-        .eq('qr_code_id' as any, (qrCode as any).id as any)
+        .select(`
+          *,
+          qr_codes!inner (
+            lesson,
+            date
+          )
+        `)
         .eq('user_id' as any, user.id as any)
         .gte('scan_time' as any, today + 'T00:00:00')
         .lte('scan_time' as any, today + 'T23:59:59');
 
       if (checkError) throw checkError;
 
-      if (existingAttendance && existingAttendance.length > 0) {
+      // Check if any of today's attendance is for the same lesson/date
+      const alreadyAttendedToday = existingAttendance && existingAttendance.some((record: any) =>
+        record.qr_codes.lesson === qrData.lesson && record.qr_codes.date === qrData.date
+      );
+
+      if (alreadyAttendedToday) {
         setAttendanceError('Anda sudah absen untuk kajian ini hari ini');
         return;
       }

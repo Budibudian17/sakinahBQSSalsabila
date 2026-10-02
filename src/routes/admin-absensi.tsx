@@ -62,11 +62,12 @@ function AdminAbsensiPage() {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [adminAttendance, setAdminAttendance] = useState<AdminAttendance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmittingAttendance, setIsSubmittingAttendance] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [alertTimeout, setAlertTimeout] = useState<number | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  
+
   // QR Code Management
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,9 +82,9 @@ function AdminAbsensiPage() {
     date: new Date().toISOString().split('T')[0],
     expires_hours: '2'
   });
-  
+
   const [nextSchedule, setNextSchedule] = useState<any>(null);
-  
+
   const { isOnline } = useOnlineStatus();
 
   useEffect(() => {
@@ -196,14 +197,27 @@ function AdminAbsensiPage() {
 
   const handleAdminAttendance = async () => {
     try {
+      setIsSubmittingAttendance(true);
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         setError('Anda harus login untuk absen');
         return;
       }
 
-      if (adminPresent) {
+      // Check if already attended today BEFORE attempting insert/delete
+      const { data: existingAttendance, error: checkError } = await supabase
+        .from('attendance' as any)
+        .select('*')
+        .eq('user_id' as any, user.id as any)
+        .eq('attended_on' as any, selectedDate as any)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') throw checkError;
+
+      const hasAttendance = !!existingAttendance;
+
+      if (hasAttendance) {
         // Remove attendance
         const { error } = await supabase
           .from('attendance' as any)
@@ -236,9 +250,12 @@ function AdminAbsensiPage() {
       if (alertTimeout) clearTimeout(alertTimeout);
       setAlertTimeout(setTimeout(() => setSuccessMessage(null), 3000) as unknown as number);
       await fetchAttendanceData();
+      await checkAdminAttendance(); // Re-check to ensure state is correct
     } catch (err) {
       console.error('Error handling admin attendance:', err);
       setError(err instanceof Error ? err.message : 'Gagal mencatat absensi');
+    } finally {
+      setIsSubmittingAttendance(false);
     }
   };
 
@@ -586,9 +603,23 @@ function AdminAbsensiPage() {
             <div className="rounded-md border border-border bg-secondary/60 p-5">
               <div className="mb-4 flex items-center gap-2 text-rose-foreground"><UserCheck size={20} /><h3 className="font-bold text-sm">Absen Diri</h3></div>
               <p className="mb-4 text-xs text-muted-foreground">Tanggal: {formatDate(selectedDate)}</p>
-              <Button className="w-full h-11" onClick={handleAdminAttendance} variant={adminPresent ? "default" : "outline"}>
-                {adminPresent ? <Check size={14} className="sm:size-15" /> : <UserCheck size={14} className="sm:size-15" />}
-                {adminPresent ? "Sudah Hadir Hari Ini" : "Saya Hadir Hari Ini"}
+              <Button
+                className="w-full h-11"
+                onClick={handleAdminAttendance}
+                variant={adminPresent ? "default" : "outline"}
+                disabled={isSubmittingAttendance || adminPresent}
+              >
+                {isSubmittingAttendance ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
+                    Mencatat...
+                  </>
+                ) : (
+                  <>
+                    {adminPresent ? <Check size={14} className="sm:size-15" /> : <UserCheck size={14} className="sm:size-15" />}
+                    {adminPresent ? "Sudah Hadir Hari Ini" : "Saya Hadir Hari Ini"}
+                  </>
+                )}
               </Button>
             </div>
           )}
