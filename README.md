@@ -59,7 +59,7 @@ Platform manajemen lengkap untuk kajian remaja muslimah dengan fitur absensi QR,
 
 ## 🛠️ Tech Stack
 
-### Frontend
+### Frontend 
 - **React 19** - UI library
 - **TypeScript 5.8** - Type safety
 - **TanStack Router** - File-based routing
