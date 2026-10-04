@@ -109,6 +109,8 @@ function AbsensiPage() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
+    console.log('Scanning - readyState:', video.readyState, 'dimensions:', video.videoWidth, 'x', video.videoHeight);
+
     if (ctx && video.readyState === video.HAVE_ENOUGH_DATA) {
       canvas.height = video.videoHeight;
       canvas.width = video.videoWidth;
@@ -120,12 +122,13 @@ function AbsensiPage() {
       });
 
       if (code) {
+        console.log('QR Code detected:', code.data);
         try {
           const qrData: QRCodeData = JSON.parse(code.data);
-          
+
           // Process attendance
           handleAttendance(qrData);
-          
+
           setQrResult(JSON.stringify(qrData, null, 2));
           setIsScanning(false);
           stopCamera();
@@ -246,8 +249,12 @@ function AbsensiPage() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
-        // Start scanning
-        animationFrameRef.current = requestAnimationFrame(scanQRCode);
+
+        // Wait for video to be ready before scanning
+        videoRef.current.onloadedmetadata = () => {
+          console.log('Video metadata loaded, dimensions:', videoRef.current?.videoWidth, 'x', videoRef.current?.videoHeight);
+          animationFrameRef.current = requestAnimationFrame(scanQRCode);
+        };
       }
     } catch (error) {
       setCameraError("Gagal mengakses kamera. Pastikan izin kamera diberikan.");
