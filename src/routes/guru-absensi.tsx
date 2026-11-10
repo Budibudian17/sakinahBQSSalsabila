@@ -124,7 +124,7 @@ function GuruAbsensiPage() {
   };
 
   const scanQRCode = () => {
-    if (!videoRef.current || !canvasRef.current || !isScanning) return;
+    if (!videoRef.current || !canvasRef.current || !streamRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -148,7 +148,7 @@ function GuruAbsensiPage() {
           const qrData: QRCodeData = JSON.parse(code.data);
 
           // Process attendance
-          handleAttendance(qrData);
+          void handleAttendance(qrData, code.data);
 
           setQrResult(JSON.stringify(qrData, null, 2));
           setIsScanning(false);
@@ -166,7 +166,7 @@ function GuruAbsensiPage() {
     animationFrameRef.current = requestAnimationFrame(scanQRCode);
   };
 
-  const handleAttendance = async (qrData: QRCodeData) => {
+  const handleAttendance = async (_qrData: QRCodeData, scannedCode: string) => {
     try {
       setAttendanceError(null);
       const { data: { user } } = await supabase.auth.getUser();
@@ -176,16 +176,17 @@ function GuruAbsensiPage() {
         return;
       }
 
-      // Validate QR code with database
+      // The payload changes during QR rotation, so validate the exact scanned token.
       const { data: qrCode, error: qrError } = await supabase
         .from('qr_codes' as any)
         .select('*')
-        .eq('qr_code_data' as any, JSON.stringify(qrData) as any)
+        .eq('qr_code_data' as any, scannedCode as any)
         .eq('is_active' as any, true as any)
-        .single();
+        .maybeSingle();
 
-      if (qrError || !qrCode) {
-        setAttendanceError('QR code tidak valid atau sudah tidak aktif');
+      if (qrError) throw qrError;
+      if (!qrCode) {
+        setAttendanceError('QR code sudah diperbarui atau tidak aktif. Minta admin menampilkan QR terbaru lalu scan lagi.');
         return;
       }
 
@@ -247,15 +248,23 @@ function GuruAbsensiPage() {
         video: { facingMode: "environment" }
       });
       streamRef.current = stream;
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        const video = videoRef.current;
+        video.srcObject = stream;
+        await video.play();
 
-        // Wait for video to be ready before scanning
-        videoRef.current.onloadedmetadata = () => {
-          console.log('Video metadata loaded, dimensions:', videoRef.current?.videoWidth, 'x', videoRef.current?.videoHeight);
+        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
           animationFrameRef.current = requestAnimationFrame(scanQRCode);
-        };
+        } else {
+          video.addEventListener('loadeddata', () => {
+            animationFrameRef.current = requestAnimationFrame(scanQRCode);
+          }, { once: true });
+        }
+      } else {
+        stream.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+        throw new Error('Tampilan kamera belum siap. Coba buka kamera lagi.');
       }
     } catch (error) {
       setCameraError("Gagal mengakses kamera. Pastikan izin kamera diberikan.");

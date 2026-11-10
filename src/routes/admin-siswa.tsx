@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/admin-shell";
 import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/page-skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { createSantriAccount } from "@/lib/auth.functions";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import {
   AlertDialog,
@@ -60,6 +61,7 @@ function AdminSiswaPage() {
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
+    password: "",
     pendidikan: "",
     rt: ""
   });
@@ -146,6 +148,7 @@ function AdminSiswaPage() {
     setFormData({
       full_name: "",
       email: "",
+      password: "",
       pendidikan: "",
       rt: ""
     });
@@ -154,7 +157,7 @@ function AdminSiswaPage() {
 
   const handleCancelModal = () => {
     // Check if form has unsaved changes
-    if (formData.full_name || formData.email || formData.pendidikan || formData.rt) {
+    if (formData.full_name || formData.email || formData.password || formData.pendidikan || formData.rt) {
       setAlertDialog({
         open: true,
         title: 'Batal',
@@ -165,6 +168,7 @@ function AdminSiswaPage() {
           setFormData({
             full_name: "",
             email: "",
+            password: "",
             pendidikan: "",
             rt: ""
           });
@@ -180,6 +184,7 @@ function AdminSiswaPage() {
     setFormData({
       full_name: student.full_name,
       email: student.email,
+      password: "",
       pendidikan: student.pendidikan || "",
       rt: student.rt || ""
     });
@@ -277,6 +282,16 @@ function AdminSiswaPage() {
       return;
     }
 
+    if (!editingStudent && formData.password.length < 8) {
+      setAlertDialog({
+        open: true,
+        title: 'Validasi',
+        description: 'Kata sandi akun siswi minimal 8 karakter.',
+        type: 'error',
+      });
+      return;
+    }
+
     try {
       if (editingStudent) {
         console.log('Updating student:', editingStudent.id);
@@ -309,46 +324,31 @@ function AdminSiswaPage() {
           type: 'success',
         });
       } else {
-        console.log('Creating new student...');
-        // Create new student
-        const insertData: any = {
+        const { id } = await createSantriAccount({
+          data: {
+            fullName: formData.full_name,
+            email: formData.email,
+            password: formData.password,
+            pendidikan: formData.pendidikan,
+            rt: formData.rt,
+          },
+        });
+
+        const newStudent: Student = {
+          id,
           full_name: formData.full_name,
           email: formData.email,
+          pendidikan: formData.pendidikan || null,
+          rt: formData.rt || null,
+          is_deleted: false,
         };
-
-        if (formData.pendidikan) insertData.pendidikan = formData.pendidikan;
-        if (formData.rt) insertData.rt = formData.rt;
-
-        const { data, error } = await supabase
-          .from('profiles' as any)
-          .insert(insertData)
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        // Assign santri role
-        const roleError = await supabase
-          .from('user_roles' as any)
-          .insert({
-            user_id: (data as any).id,
-            role: 'santri'
-          } as any);
-
-        if (roleError.error) {
-          console.error('Error assigning role:', roleError.error);
-          // Continue anyway - profile was created successfully
-        }
-
-        console.log('Student created, updating UI...');
-        // Manual state update
-        setStudentsData(prev => [data as unknown as Student, ...prev]);
+        setStudentsData(prev => [newStudent, ...prev]);
         setCurrentPage(1);
         setIsModalOpen(false);
         setAlertDialog({
           open: true,
           title: 'Berhasil',
-          description: 'Siswi baru berhasil ditambahkan.',
+          description: 'Akun siswi berhasil dibuat. Berikan email dan kata sandi yang sudah disepakati kepada siswi.',
           type: 'success',
         });
       }
@@ -526,6 +526,24 @@ function AdminSiswaPage() {
                 placeholder="contoh@sakinah.id"
               />
             </div>
+            {!editingStudent && (
+              <div>
+                <label className="mb-1 block text-xs font-semibold">Kata Sandi</label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-xs sm:text-sm"
+                  placeholder="Minimal 8 karakter"
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
+                />
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  Berikan kata sandi ini langsung kepada siswi.
+                </p>
+              </div>
+            )}
             <div>
               <label className="mb-1 block text-xs font-semibold">Pendidikan</label>
               <select
@@ -555,7 +573,9 @@ function AdminSiswaPage() {
           </div>
           <div className="mt-6 flex gap-3">
             <Button variant="outline" className="flex-1" onClick={handleCancelModal}>Batal</Button>
-            <Button className="flex-1" onClick={handleSaveStudent}>Simpan</Button>
+            <Button className="flex-1" onClick={handleSaveStudent}>
+              {editingStudent ? "Simpan" : "Buat Akun Siswi"}
+            </Button>
           </div>
         </div>
       </div>

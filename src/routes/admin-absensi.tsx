@@ -157,7 +157,9 @@ function AdminAbsensiPage() {
         full_name: record.profiles.full_name,
         qr_code_id: null,
         lesson: record.lesson,
-        scan_time: record.check_in_time,
+        scan_time: record.check_in_time
+          ? `${record.attended_on}T${record.check_in_time}`
+          : record.attended_on,
         status: record.status,
         role: 'Admin'
       }));
@@ -185,9 +187,9 @@ function AdminAbsensiPage() {
         .select('*')
         .eq('user_id' as any, user.id as any)
         .eq('attended_on' as any, selectedDate as any)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
 
       setAdminPresent(!!existingAttendance);
     } catch (err) {
@@ -211,9 +213,9 @@ function AdminAbsensiPage() {
         .select('*')
         .eq('user_id' as any, user.id as any)
         .eq('attended_on' as any, selectedDate as any)
-        .single();
+        .maybeSingle();
 
-      if (checkError && checkError.code !== 'PGRST116') throw checkError;
+      if (checkError) throw checkError;
 
       const hasAttendance = !!existingAttendance;
 
@@ -237,7 +239,7 @@ function AdminAbsensiPage() {
             user_id: user.id,
             lesson: 'Kajian Rutin',
             attended_on: selectedDate,
-            check_in_time: new Date().toISOString(),
+            check_in_time: new Date().toTimeString().slice(0, 8),
             status: 'Hadir'
           } as any);
 

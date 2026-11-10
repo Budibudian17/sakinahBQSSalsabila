@@ -103,7 +103,7 @@ function AbsensiPage() {
   };
 
   const scanQRCode = () => {
-    if (!videoRef.current || !canvasRef.current || !isScanning) return;
+    if (!videoRef.current || !canvasRef.current || !streamRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -127,7 +127,7 @@ function AbsensiPage() {
           const qrData: QRCodeData = JSON.parse(code.data);
 
           // Process attendance
-          handleAttendance(qrData);
+          void handleAttendance(qrData, code.data);
 
           setQrResult(JSON.stringify(qrData, null, 2));
           setIsScanning(false);
@@ -145,7 +145,7 @@ function AbsensiPage() {
     animationFrameRef.current = requestAnimationFrame(scanQRCode);
   };
 
-  const handleAttendance = async (qrData: QRCodeData) => {
+  const handleAttendance = async (qrData: QRCodeData, scannedCode: string) => {
     try {
       setAttendanceError(null);
       const { data: { user } } = await supabase.auth.getUser();
@@ -157,26 +157,25 @@ function AbsensiPage() {
 
       console.log('QR Data scanned:', qrData);
 
-      // Validate QR code with database - match by lesson and date (more reliable than qr_code_id which rotates)
-      const { data: qrCodes, error: qrError } = await supabase
+      // The payload changes during QR rotation, so validate the exact scanned token.
+      const { data: qrCode, error: qrError } = await supabase
         .from('qr_codes' as any)
         .select('*')
-        .eq('lesson' as any, qrData.lesson as any)
-        .eq('date' as any, qrData.date as any)
-        .eq('is_active' as any, true as any);
+        .eq('qr_code_data' as any, scannedCode as any)
+        .eq('is_active' as any, true as any)
+        .maybeSingle();
 
-      if (qrError || !qrCodes || qrCodes.length === 0) {
+      if (qrError) throw qrError;
+      if (!qrCode) {
         console.error('QR validation error:', qrError);
-        setAttendanceError('QR code tidak valid atau sudah tidak aktif');
+        setAttendanceError('QR code sudah diperbarui atau tidak aktif. Minta admin menampilkan QR terbaru lalu scan lagi.');
         return;
       }
 
-      // Get the most recent active QR code for this lesson/date
-      const qrCode = qrCodes[0];
       console.log('QR Code found:', qrCode);
 
       // Check if QR code is expired
-      if ((qrCode as any).expires_at && new Date((qrCode as any).expires_at) < new Date()) {
+      if (qrCode.expires_at && new Date(qrCode.expires_at) < new Date()) {
         setAttendanceError('QR code sudah expired/waktu habis');
         return;
       }
@@ -200,7 +199,7 @@ function AbsensiPage() {
 
       // Check if any of today's attendance is for the same lesson/date
       const alreadyAttendedToday = existingAttendance && existingAttendance.some((record: any) =>
-        record.qr_codes.lesson === qrData.lesson && record.qr_codes.date === qrData.date
+        record.qr_codes.lesson === qrCode.lesson && record.qr_codes.date === qrCode.date
       );
 
       if (alreadyAttendedToday) {
@@ -246,15 +245,23 @@ function AbsensiPage() {
         video: { facingMode: "environment" }
       });
       streamRef.current = stream;
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        const video = videoRef.current;
+        video.srcObject = stream;
+        await video.play();
 
-        // Wait for video to be ready before scanning
-        videoRef.current.onloadedmetadata = () => {
-          console.log('Video metadata loaded, dimensions:', videoRef.current?.videoWidth, 'x', videoRef.current?.videoHeight);
+        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
           animationFrameRef.current = requestAnimationFrame(scanQRCode);
-        };
+        } else {
+          video.addEventListener('loadeddata', () => {
+            animationFrameRef.current = requestAnimationFrame(scanQRCode);
+          }, { once: true });
+        }
+      } else {
+        stream.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+        throw new Error('Tampilan kamera belum siap. Coba buka kamera lagi.');
       }
     } catch (error) {
       setCameraError("Gagal mengakses kamera. Pastikan izin kamera diberikan.");

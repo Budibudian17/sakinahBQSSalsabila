@@ -48,25 +48,37 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          deleted_at: string | null
           email: string
           full_name: string
           id: string
+          is_deleted: boolean
+          pendidikan: string | null
+          rt: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string
           full_name?: string
           id: string
+          is_deleted?: boolean
+          pendidikan?: string | null
+          rt?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string
           full_name?: string
           id?: string
+          is_deleted?: boolean
+          pendidikan?: string | null
+          rt?: string | null
           updated_at?: string
         }
         Relationships: []

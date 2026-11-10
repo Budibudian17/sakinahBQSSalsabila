@@ -110,13 +110,17 @@ cp .env.local.example .env.local
 Edit `.env.local` dengan credentials Supabase Anda:
 ```env
 VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_server_only_secret_key
 ```
+
+`SUPABASE_SERVICE_ROLE_KEY` hanya untuk server. Jangan beri prefix `VITE_` dan jangan pernah membagikannya.
 
 4. **Setup database**
 ```bash
 bun run db:push
-# atau manual: run migrations in Supabase SQL Editor
+# or run supabase/setup.sql and then supabase/app_schema.sql in Supabase SQL Editor
 ```
 
 5. **Run development server**
@@ -232,7 +236,9 @@ Tables utama:
 | Variable | Description | Required |
 |----------|-------------|-----------|
 | `VITE_SUPABASE_URL` | Supabase project URL | Yes |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anon key | Yes |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key | Yes |
+| `SUPABASE_URL` | Supabase project URL for server-side admin operations | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase secret key; never expose in client code | Yes |
 
 ---
 

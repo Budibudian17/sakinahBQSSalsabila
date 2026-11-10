@@ -56,7 +56,7 @@ function SetupPage() {
     setIsLoading(true);
 
     try {
-      await setupFirstAdmin({ fullName, email, password } as any);
+      await setupFirstAdmin({ data: { fullName, email, password } });
       setSuccess(true);
       setTimeout(() => {
         navigate({ to: "/login" });
