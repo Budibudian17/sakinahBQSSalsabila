@@ -54,8 +54,6 @@ function createSupabaseClient() {
       autoRefreshToken: true,
       detectSessionInUrl: true,
       flowType: 'pkce',
-      // Set session expiration to 1 hour (3600 seconds)
-      expiresIn: 3600,
     },
   });
 }

@@ -286,6 +286,12 @@ CREATE POLICY "Signed-in read active QR codes" ON public.qr_codes
   USING (
     is_active = true
     OR public.has_role((SELECT auth.uid()), 'admin'::public.app_role)
+    OR EXISTS (
+      SELECT 1
+      FROM public.qr_attendance
+      WHERE qr_attendance.qr_code_id = qr_codes.id
+        AND qr_attendance.user_id = (SELECT auth.uid())
+    )
   );
 CREATE POLICY "Admin manage QR codes" ON public.qr_codes
   FOR ALL TO authenticated
@@ -313,6 +319,30 @@ CREATE POLICY "Admin manage QR attendance" ON public.qr_attendance
   FOR ALL TO authenticated
   USING (public.has_role((SELECT auth.uid()), 'admin'::public.app_role))
   WITH CHECK (public.has_role((SELECT auth.uid()), 'admin'::public.app_role));
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'qr_attendance'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.qr_attendance;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'attendance'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.attendance;
+  END IF;
+END
+$$;
 
 DROP POLICY IF EXISTS "Read published materials" ON public.materi;
 DROP POLICY IF EXISTS "Admin manage materials" ON public.materi;

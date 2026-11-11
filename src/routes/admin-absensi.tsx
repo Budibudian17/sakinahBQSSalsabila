@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowLeft, Camera, Check, Clock3, QrCode, ScanLine, ShieldCheck, Sparkles, X, Users, GraduationCap, UserCheck, Search, RefreshCw, WifiOff, Calendar, Plus, Download, Copy } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -94,7 +94,7 @@ function AdminAbsensiPage() {
     fetchNextSchedule();
   }, [selectedDate]);
 
-  const fetchAttendanceData = async () => {
+  const fetchAttendanceData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -174,7 +174,35 @@ function AdminAbsensiPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate]);
+
+  useEffect(() => {
+    const refreshAttendance = () => {
+      void fetchAttendanceData();
+    };
+
+    const channel = supabase
+      .channel(`attendance-live-${selectedDate}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'qr_attendance' },
+        refreshAttendance,
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'attendance' },
+        refreshAttendance,
+      )
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          setError('Koneksi realtime absensi terputus. Coba muat ulang halaman.');
+        }
+      });
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [fetchAttendanceData, selectedDate]);
 
   const checkAdminAttendance = async () => {
     try {

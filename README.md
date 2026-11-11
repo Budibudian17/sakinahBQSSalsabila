@@ -123,6 +123,8 @@ bun run db:push
 # or run supabase/setup.sql and then supabase/app_schema.sql in Supabase SQL Editor
 ```
 
+For an existing Supabase project, run the updated `supabase/app_schema.sql` in the SQL Editor after deploying schema changes. It also enables Realtime for attendance tables.
+
 5. **Run development server**
 ```bash
 bun run dev
